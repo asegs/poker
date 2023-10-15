@@ -321,8 +321,7 @@ def get_highest_players_full_house(hands):
     return highest_hand
 
 
-def pick_winner(player_holes, river):
-    player_hands = list(map(lambda hole: hole + river, player_holes))
+def pick_winner(player_hands):
     winners = []
     excluded = []
     scores = list(map(score_hand, player_hands))
@@ -367,17 +366,13 @@ def pick_winner(player_holes, river):
 
 for i in range(1000):
     deck = Deck.new_deck()
-    river = Deal.deal_cards(deck, 5)
-    p1 = Deal.deal_hand(deck)
-    p2 = Deal.deal_hand(deck)
-    p3 = Deal.deal_hand(deck)
-    print(river)
+    [p1, p2, p3] = Deal.deal_holdem(deck, 3)
     print(p1)
     print(p2)
     print(p3)
 
-    print(score_hand(p1 + river))
-    print(score_hand(p2 + river))
-    print(score_hand(p3 + river))
+    print(score_hand(p1))
+    print(score_hand(p2))
+    print(score_hand(p3))
 
-    print(pick_winner([p1, p2, p3], river))
+    print(pick_winner([p1, p2, p3]))

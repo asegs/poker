@@ -1,7 +1,5 @@
 import random
 
-from Deck import new_deck
-
 
 def deal_cards(deck, count):
     returned = []
@@ -29,3 +27,10 @@ def deal_full(deck):
 
 def deal_hands(deck, players):
     return [deal_hand(deck) for i in range(players)]
+
+
+def deal_holdem(deck, players):
+    holes = deal_hands(deck, players)
+    community = deal_cards(deck, 5)
+
+    return list(map(lambda hole: hole + community, holes))
