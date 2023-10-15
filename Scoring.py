@@ -277,17 +277,6 @@ def score_hand(hand):
     return hands
 
 
-def hands_all_equal(hands):
-    print(hands)
-    if not hands:
-        return True
-    first_hand = hands[0]
-    for hand in hands[1:]:
-        if first_hand != hand:
-            return False
-    return True
-
-
 def get_highest_players(hands):
     highest_hands = []
     highest_rank = -1
@@ -335,6 +324,7 @@ def pick_winner(player_hands):
             if i in excluded:
                 continue
 
+            # At this point, there should be no way that one player being out of options shouldn't mean a tie for all
             if tiebreaks_round >= len(score):
                 return winners
 
