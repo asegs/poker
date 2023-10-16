@@ -224,10 +224,9 @@ def remove_from_pool(mutable_hand, cards):
             mutable_hand.remove(card)
 
 
-def score_hand(hand):
+def score_hand(hand, card_budget=5):
     hands = []
     mutable_hand = hand.copy()
-    cards_used = 0
     royal_flushes = get_royal_flushes(mutable_hand)
     if royal_flushes:
         return [(Hand.ROYAL_FLUSH, get_highest(royal_flushes))]
@@ -239,7 +238,7 @@ def score_hand(hand):
         highest_four_of_kind = get_highest(four_of_a_kinds)
         hands.append((Hand.FOUR_OF_A_KIND, get_highest(four_of_a_kinds)))
         remove_from_pool(mutable_hand, highest_four_of_kind)
-        cards_used += 4
+        card_budget -= 4
     full_houses = get_full_houses(mutable_hand)
     if full_houses:
         return [(Hand.FULL_HOUSE, get_highest_full_house(full_houses))]
@@ -250,30 +249,30 @@ def score_hand(hand):
     if straights:
         return [(Hand.STRAIGHT, get_highest(straights))]
     three_of_a_kinds = get_three_of_a_kinds(mutable_hand)
-    if three_of_a_kinds and (cards_used + 3 <= 5):
+    if three_of_a_kinds and (card_budget - 3 >= 0):
         highest_three_of_kind = get_highest(three_of_a_kinds)
         hands.append((Hand.THREE_OF_A_KIND, highest_three_of_kind))
         remove_from_pool(mutable_hand, highest_three_of_kind)
-        cards_used += 3
+        card_budget -= 3
 
     two_pairs = get_two_pairs(mutable_hand)
-    if two_pairs and (cards_used + 4 <= 5):
+    if two_pairs and (card_budget - 4 >= 0):
         highest_two_pair = get_highest(two_pairs)
         hands.append((Hand.TWO_PAIR, highest_two_pair))
         remove_from_pool(mutable_hand, highest_two_pair)
-        cards_used += 4
+        card_budget -= 4
     pairs = get_pairs(mutable_hand)
-    if pairs and (cards_used + 2 <= 5):
+    if pairs and (card_budget - 2 >= 0):
         highest_pair = get_highest(pairs)
         hands.append((Hand.PAIR, highest_pair))
         remove_from_pool(mutable_hand, highest_pair)
-        cards_used += 2
+        card_budget -= 2
 
-    while cards_used < 5:
+    while card_budget > 0:
         high = get_high(mutable_hand)
         mutable_hand.remove(high)
         hands.append((Hand.HIGH_CARD, [high]))
-        cards_used += 1
+        card_budget -= 1
     return hands
 
 
@@ -292,7 +291,7 @@ def get_highest_players(hands):
 
 
 def get_highest_players_full_house(hands):
-    highest_hand = None
+    highest_hands = []
     highest_trip_rank = -1
     highest_pair_rank = -1
 
@@ -300,14 +299,24 @@ def get_highest_players_full_house(hands):
         pair_rank = hand[0][0].rank
         trip_rank = hand[1][0].rank
         if trip_rank > highest_trip_rank:
-            highest_hand = i
+            highest_hands = [i]
             highest_trip_rank = trip_rank
             highest_pair_rank = pair_rank
         elif trip_rank == highest_trip_rank and pair_rank > highest_pair_rank:
-            highest_hand = i
+            highest_hands = [i]
             highest_pair_rank = pair_rank
+        elif trip_rank == highest_trip_rank and pair_rank == pair_rank:
+            highest_hands.append(i)
 
-    return highest_hand
+    return highest_hands
+
+
+def get_relevant_winning_hands(winner_ids, scores, tiebreaks):
+    return [score[:tiebreaks] for i, score in enumerate(scores) if i in winner_ids]
+
+
+def describe_winning_hand(winning_sections):
+    return ','.join([str(section[0]) for section in winning_sections])
 
 
 def pick_winner(player_hands):
@@ -326,7 +335,7 @@ def pick_winner(player_hands):
 
             # At this point, there should be no way that one player being out of options shouldn't mean a tie for all
             if tiebreaks_round >= len(score):
-                return winners
+                return winners, get_relevant_winning_hands(winners, scores, tiebreaks_round)
 
             # Find players in this round on the same level
             player_hand_score = score[tiebreaks_round][0]
@@ -340,29 +349,30 @@ def pick_winner(player_hands):
         if len(winners) > 1:
             winners_sections = list(map(lambda x: scores[x][tiebreaks_round][1], winners))
             if highest_position == Hand.FULL_HOUSE:
-                winner = get_highest_players_full_house(winners_sections)
-                return [winners[winner]]
+                winner_ids = get_highest_players_full_house(winners_sections)
             else:
-                winners = list(map(lambda x: winners[x], get_highest_players(winners_sections)))
+                winner_ids = get_highest_players(winners_sections)
+
+            winners = list(map(lambda x: winners[x], winner_ids))
 
             # Anyone below that level will not be relevant in the next tiebreak rounds
             for x in range(len(scores)):
                 if x not in winners:
                     excluded.append(x)
-            tiebreaks_round += 1
+        tiebreaks_round += 1
 
-    return winners
+    return winners, get_relevant_winning_hands(winners, scores, tiebreaks_round)
 
 
-for i in range(1000):
-    deck = Deck.new_deck()
-    [p1, p2, p3] = Deal.deal_holdem(deck, 3)
-    print(p1)
-    print(p2)
-    print(p3)
-
-    print(score_hand(p1))
-    print(score_hand(p2))
-    print(score_hand(p3))
-
-    print(pick_winner([p1, p2, p3]))
+# for i in range(1000):
+#     deck = Deck.new_deck()
+#     [p1, p2, p3] = Deal.deal_holdem(deck, 3)
+#     print(p1)
+#     print(p2)
+#     print(p3)
+#
+#     print(score_hand(p1))
+#     print(score_hand(p2))
+#     print(score_hand(p3))
+#
+#     print(pick_winner([p1, p2, p3]))
