@@ -37,9 +37,9 @@ def color_suit(suit):
 
 def rows_of_card(card):
     return [
-        colorama.Back.WHITE + ' ' + color_suit(card.suit) + '   ' + colorama.Back.RESET,
-        colorama.Back.WHITE + '  ' + color_rank(card.rank, card.suit) + '  ' + colorama.Back.RESET,
-        colorama.Back.WHITE + '   ' + color_suit(card.suit) + ' ' + colorama.Back.RESET
+        ' ' + colorama.Back.WHITE + ' ' + color_suit(card.suit) + '   ' + colorama.Back.RESET,
+        ' ' + colorama.Back.WHITE + '  ' + color_rank(card.rank, card.suit) + '  ' + colorama.Back.RESET,
+        ' ' + colorama.Back.WHITE + '   ' + color_suit(card.suit) + ' ' + colorama.Back.RESET
     ]
 
 
