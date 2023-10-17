@@ -11,7 +11,14 @@ names = [
     "Tommy",
     "Al",
     "Ivan",
-    "Erlang"
+    "Erlang",
+    "The Kid",
+    "Jarvis",
+    "Fats",
+    "Billy",
+    "Randall",
+    "Bad Randall",
+    "Minnesota"
 ]
 
 random.shuffle(names)
