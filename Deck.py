@@ -22,6 +22,7 @@ SUITS = [SPADES, CLUBS, HEARTS, DIAMONDS]
 
 good_red = '\033[38;2;160;0;0m'
 
+
 def color_rank(rank, suit):
     fmt_rank = format_rank(rank)
     if suit == SPADES or suit == CLUBS:
@@ -49,6 +50,8 @@ def print_hand(cards):
         for card_row_set in card_rows:
             print(card_row_set[row], end='  ')
         print()
+
+
 @dataclass
 class Card:
     rank: int
