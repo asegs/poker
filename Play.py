@@ -5,10 +5,9 @@ import random
 import Betting
 
 
-def print_odds(hand, community, names):
-    odds = Betting.player_win_chance(hand, community, names[:players]) * 100
+def print_odds(hands, community, names, idx):
+    odds = Betting.player_win_chance(hands, community, names[:players], idx) * 100
     print("Odds of winning: " + format(odds, ".2f") + "%")
-
 
 
 names = [
@@ -49,31 +48,27 @@ print(greeting)
 print("Your hand:")
 Deck.print_hand(hands[0])
 print("You have: " + str(Scoring.score_hand(hands[0], 2)[0][0]))
-print_odds(hands[0], [], names[:players])
+print_odds(hands, [], names[:players], 0)
 
 input("Do the flop...")
 community = Deal.deal_flop(deck)
 Deck.print_hand(community)
 print("You have: " + str(Scoring.score_hand(hands[0] + community)[0][0]))
-print_odds(hands[0], community, names[:players])
+print_odds(hands, community, names[:players], 0)
 
 input("Do the turn...")
 community.append(Deal.deal_single(deck))
 Deck.print_hand(community)
 print("You have: " + str(Scoring.score_hand(hands[0] + community)[0][0]))
-print_odds(hands[0], community, names[:players])
-
+print_odds(hands, community, names[:players], 0)
 
 input("Do the river...")
 community.append(Deal.deal_single(deck))
 Deck.print_hand(community)
 print("You have: " + str(Scoring.score_hand(hands[0] + community)[0][0]))
-print_odds(hands[0], community, names[:players])
-
-
+print_odds(hands, community, names[:players], 0)
 
 input("Do the showdown...")
-
 
 for i, hand in enumerate(hands[1:]):
     print(names[i + 1] + ":")

@@ -20,9 +20,11 @@ def hand_to_pp_card(hand):
     return [card_to_pp_card(card) for card in hand]
 
 
-def player_win_chance(hand, community, names):
-    player = pp.Player("Aaron", hand_to_pp_card(hand))
-    players = [player] + [pp.Player(names[i]) for i in range(len(names) - 1)]
+def player_win_chance(hands, community, names, player_idx):
+    players = [pp.Player(names[i], (hand_to_pp_card(hands[player_idx]) if i == player_idx else [])) for i in
+               range(len(names) - 1)]
+    player = players[player_idx]
+
     community_cards = hand_to_pp_card(community)
     simulator = pp.PokerRoundSimulator(community_cards=community_cards,
                                        players=players,
