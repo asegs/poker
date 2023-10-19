@@ -47,8 +47,9 @@ class PlayerState:
     contribution: int
     make_decision: callable
     money: int
+    name: str
 
-    def __init__(self, cards, money, human):
+    def __init__(self, cards, money, human, name):
         self.cards = cards
         self.money = money
         if human:
@@ -58,6 +59,7 @@ class PlayerState:
         self.folded = False
         self.raised = False
         self.contribution = 0
+        self.name = name
 
 
 
@@ -158,6 +160,8 @@ def cpu_bet(round, idx, names):
 
 
 def human_bet(round, idx, names):
+    if round.players[idx].folded:
+        return
     missing = missing_contribution(round, idx)
     can_raise = not round.players[idx].raised
 
@@ -170,9 +174,9 @@ def human_bet(round, idx, names):
     print("You have $" + str(round.players[idx].money) + " left")
     print("$" + str(missing) + " to play...")
     if missing == 0:
-        choice = input("(C)heck or (r)aise?")
+        choice = input("(C)heck or (r)aise? ")
     else:
-        prompt = "(C)all, (f)old, or (r)aise?" if can_raise else "(C)all or (f)old?"
+        prompt = "(C)all, (f)old, or (r)aise? " if can_raise else "(C)all or (f)old? "
         choice = input(prompt)
 
     if choice.lower() == 'c':
