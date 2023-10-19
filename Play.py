@@ -15,6 +15,12 @@ def play_round(round, names):
         if not player.folded:
             player.make_decision(round, i, names)
 
+    # Matching possible raises
+    for i, player in enumerate(round.players):
+        if not player.folded:
+            player.make_decision(round, i, names)
+
+
     round.reset_between_bets()
 
 

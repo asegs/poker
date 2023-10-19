@@ -116,6 +116,9 @@ def cpu_bet(round, idx, names):
 
     missing = missing_contribution(round, idx)
 
+    if missing == 0 and round.players[idx].raised:
+        return
+
     budget = round.players[idx].money
     if missing > budget:
         round.players[idx].folded = True
@@ -156,6 +159,11 @@ def cpu_bet(round, idx, names):
 
 def human_bet(round, idx, names):
     missing = missing_contribution(round, idx)
+    can_raise = not round.players[idx].raised
+
+    if missing == 0 and not can_raise:
+        return
+
 
     pot = round.pot_size()
     print("Pot: $" + str(pot))
@@ -164,7 +172,8 @@ def human_bet(round, idx, names):
     if missing == 0:
         choice = input("(C)heck or (r)aise?")
     else:
-        choice = input("(C)all, (f)old, or (r)aise?")
+        prompt = "(C)all, (f)old, or (r)aise?" if can_raise else "(C)all or (f)old?"
+        choice = input(prompt)
 
     if choice.lower() == 'c':
         round.players[idx].contribution += missing
