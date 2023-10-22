@@ -5,8 +5,9 @@ import random
 import Betting
 
 
-def print_odds(hands, community, names, idx):
-    odds = Betting.player_win_chance(hands[idx], community, names[:players]) * 100
+def print_odds(betting_round, idx):
+    still_in_names = [player.name for player in betting_round.players if not player.folded]
+    odds = Betting.player_win_chance(betting_round.players[idx].cards, betting_round.community, still_in_names) * 100
     print("Odds of winning: " + format(odds, ".2f") + "%")
 
 
@@ -19,7 +20,7 @@ def print_remaining(round):
 def play_turn(round, cards = 5):
     Deck.print_hand(betting_round.community)
     print("You have: " + str(Scoring.score_hand(hands[0] + betting_round.community, cards)[0][0]))
-    print_odds(hands, betting_round.community, names[:players], 0)
+    print_odds(round, 0)
     play_round(betting_round)
     print_remaining(round)
     if round.remaining() <= 1:
