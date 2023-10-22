@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import Deck
 
 WINDOW = 20
+BOLDNESS = 2
 
 ENGLISH_SUITS = {
     Deck.SPADES: 's',
@@ -62,7 +63,6 @@ class PlayerState:
         self.name = name
 
 
-
 @dataclass
 class Round:
     players: list
@@ -109,7 +109,8 @@ def missing_contribution(round, idx):
     return 0
 
 
-def cpu_bet(round, idx, names):
+def cpu_bet(round, idx):
+    names = [player.name for player in round.players]
     name = names[idx]
     still_in_names = [names[i] for i in range(len(round.players)) if not round.players[i].folded]
     odds = player_win_chance(round.players[idx].cards, round.community, still_in_names)
@@ -136,10 +137,15 @@ def cpu_bet(round, idx, names):
         print(name + " folded.")
         return
     if happy_odds >= expected_odds:
+        want_to_bet = int((odds - expected_odds) * budget)
         if odds >= expected_odds:
-            bet = 0 if round.players[idx].raised else int((odds - expected_odds) * budget)
+            bet = 0 if round.players[idx].raised else want_to_bet
             bet += missing
             if bet == missing:
+                if missing > want_to_bet * BOLDNESS:
+                    round.players[idx].folded = True
+                    print(name + " folded.")
+                    return
                 print(name + " called.")
             else:
                 print(name + " raised " + str(bet - missing))
@@ -149,8 +155,11 @@ def cpu_bet(round, idx, names):
             round.players[idx].money -= bet
             return
 
-
         elif missing > 0:
+            if missing > want_to_bet * BOLDNESS:
+                round.players[idx].folded = True
+                print(name + " folded.")
+                return
             round.players[idx].contribution += missing
             round.players[idx].money -= missing
             print(name + " called.")
@@ -159,7 +168,7 @@ def cpu_bet(round, idx, names):
             print(name + " checked.")
 
 
-def human_bet(round, idx, names):
+def human_bet(round, idx):
     if round.players[idx].folded:
         return
     missing = missing_contribution(round, idx)
@@ -167,7 +176,6 @@ def human_bet(round, idx, names):
 
     if missing == 0 and not can_raise:
         return
-
 
     pot = round.pot_size()
     print("Pot: $" + str(pot))

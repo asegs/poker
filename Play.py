@@ -16,23 +16,27 @@ def print_remaining(round):
             print(player.name + " in with " + str(player.money))
 
 
-def play_turn(round):
+def play_turn(round, cards = 5):
     Deck.print_hand(betting_round.community)
-    print("You have: " + str(Scoring.score_hand(hands[0] + betting_round.community)[0][0]))
+    print("You have: " + str(Scoring.score_hand(hands[0] + betting_round.community, cards)[0][0]))
     print_odds(hands, betting_round.community, names[:players], 0)
-    play_round(betting_round, names[:players])
+    play_round(betting_round)
     print_remaining(round)
+    if round.remaining() <= 1:
+        remaining_player = [player for player in round.players if not player.folded][0]
+        print(remaining_player.name + " wins!")
+        exit(0)
 
 
-def play_round(round, names):
+def play_round(round):
     for i, player in enumerate(round.players):
         if not player.folded:
-            player.make_decision(round, i, names)
+            player.make_decision(round, i)
 
     # Matching possible raises
     for i, player in enumerate(round.players):
         if not player.folded:
-            player.make_decision(round, i, names)
+            player.make_decision(round, i)
 
     round.reset_between_bets()
 
@@ -77,10 +81,7 @@ print(greeting)
 
 print("Your hand:")
 Deck.print_hand(hands[0])
-print("You have: " + str(Scoring.score_hand(hands[0], 2)[0][0]))
-print_odds(hands, betting_round.community, names[:players], 0)
-play_round(betting_round, names[:players])
-print_remaining(betting_round)
+play_turn(betting_round, 2)
 
 input("Do the flop...")
 betting_round.community = Deal.deal_flop(deck)
